@@ -24,17 +24,29 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
 		ofxKFW2::Device kinect;
+		int KINECT_DEPTH_WIDTH  =  512;
+		int KINECT_DEPTH_HEIGHT =  424;
+		int KINECT_COLOR_WIDTH  = 1920;
+		int KINECT_COLOR_HEIGHT = 1080;
 
 		int colorWidth, colorHeight;
 		ofxCvColorImage colorImage;
 		ofxCvGrayscaleImage grayImage;
 		ofxCvGrayscaleImage grayBackground;
 		ofxCvGrayscaleImage grayDifference;
+		ofxCvGrayscaleImage depthImage;
+		ofxCvGrayscaleImage depthBackground;
+		ofxCvGrayscaleImage depthDifference;
 		ofxCvContourFinder contourFinder;
+
+		ofFbo depthFbo;
+		ofShader testShader;
+
+		ofMesh depthMesh;
+
+		ofImage testImage;
 
 		int threshold;
 		bool bLearnBackground;
-		bool bHaveAllStreams;
 
-		ofImage img;
 };
