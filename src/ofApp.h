@@ -4,6 +4,7 @@
 #include "ofxKinectForWindows2.h"
 #include "ofxOpenCv.h"
 #include "ofxDatGui.h"
+#include "ofxOsc.h"
 
 class ofApp : public ofBaseApp{
 
@@ -11,6 +12,8 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+
+		void setupGui();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -24,31 +27,62 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+		int width, height;
+
 		ofxKFW2::Device kinect;
 		int KINECT_DEPTH_WIDTH  =  512;
 		int KINECT_DEPTH_HEIGHT =  424;
 		int KINECT_COLOR_WIDTH  = 1920;
 		int KINECT_COLOR_HEIGHT = 1080;
+		struct KinectSettings {
+			float nearPlane = 0.0;
+			float farPlane = 0.08;
+			bool bClipNear;
+			float nearClip = 0.0;
+			bool bClipFar;
+			float farClip = 0.05;
+			bool bClipLeft = false;
+			float nearLeftClip = 0.0;
+			float farLeftClip = 0.23;
+			bool bClipRight = false;
+			float nearRightClip = 1.0;
+			float farRightClip = 0.74;
+			bool bClipTop = false;
+			float nearTopClip = 0.0;
+			float farTopClip = 0.41;
+			bool bClipBottom = false;
+			float nearBottomClip = 1.0;
+			float farBottomClip = 0.81;
+		} kinectSettings;
 
-		ofxCvGrayscaleImage depthImage;
-		ofxCvGrayscaleImage depthBackground;
-		ofxCvGrayscaleImage depthDifference;
-		ofxCvContourFinder contourFinder;
+		ofxOscSender oscSender;
+		struct OscSettings {
+			string hostname = "localhost";
+			int port = 12345;
+		} oscSettings;
 
-		ofImage testImage;
-
-		ofFbo depthScaleFbo;
-		ofFbo depthDiffFbo;
-		ofShader depthScaleShader;
-		ofShader depthDiffShader;
+		ofxCvGrayscaleImage depthDifferenceImage;
+		ofFbo depthBackgroundFbo;
+		ofFbo depthIncomingFbo;
+		ofFbo depthDifferenceFbo;
+		ofFbo depthBlurFbo;
+		ofShader depthPreprocessShader;
+		ofShader depthDifferenceShader;
+		ofShader depthBlurShader;
 		ofMesh depthMesh;
+		ofxCvContourFinder contourFinder;
+		struct ContourFinderSettings {
+			float threshold = 0.03;
+			int minBlobSize = 500;
+			int maxBlobSize = 691200;
+			int maxNumBlobs = 10;
+			bool bFindHoles = false;
+			bool bLearnBackground = true;
+			bool bBlurPass = true;
+			float blurStrength = 1.0;
+		} contourFinderSettings;
 
-		int threshold;
-		bool bLearnBackground;
-
-		int width, height;
-
-		void setupGui();
+		// Gui Elements
 		ofxDatGui* gui;
 		// -- Header/Footer Elements
 		ofxDatGuiHeader* guiHeader;
@@ -77,38 +111,13 @@ class ofApp : public ofBaseApp{
 		ofxDatGuiSlider* sliderFarBottomClip;
 		// -- Blob Tracking GUI Elements
 		ofxDatGuiSlider* sliderThreshold;
+		ofxDatGuiToggle* toggleBlurPass;
+		ofxDatGuiSlider* sliderBlurStrength;
 		ofxDatGuiSlider* sliderMinBlobSize;
 		ofxDatGuiSlider* sliderMaxBlobSize;
 		ofxDatGuiSlider* sliderMaxNumBlobs;
 		ofxDatGuiToggle* toggleFindHoles;
-
-		struct KinectSetupParameters {
-			float nearPlane = 0.0;
-			float farPlane = 0.08;
-			bool bClipNear;
-			float nearClip = 0.0;
-			bool bClipFar;
-			float farClip = 0.5;
-			bool bClipLeft = false;
-			float nearLeftClip = 0.0;
-			float farLeftClip = 0.23;
-			bool bClipRight = false;
-			float nearRightClip = 1.0;
-			float farRightClip = 0.74;
-			bool bClipTop = false;
-			float nearTopClip = 0.0;
-			float farTopClip = 0.41;
-			bool bClipBottom = false;
-			float nearBottomClip = 1.0;
-			float farBottomClip = 0.81;
-		} kinectSetupParameters;
-
-		struct BlobTrackingParameters {
-			float threshold = 0.0;
-			int minBlobSize = 500;
-			int maxBlobSize = 691200;
-			int maxNumBlobs = 10;
-			bool bFindHoles = false;
-		} blobTrackingParameters;
-
+		// -- Network Settings Elements
+		ofxDatGuiTextInput* inputOscHostname;
+		ofxDatGuiTextInput* inputOscPort;
 };
