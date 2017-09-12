@@ -156,7 +156,30 @@ void ofApp::update(){
 		m.setAddress("/blobTracker/nBlobs");
 		m.addIntArg(contourFinder.nBlobs);
 		oscSender.sendMessage(m, false);
-		// TODO: Send Blob Information
+
+		for (int i = 0; i < contourFinder.nBlobs; ++i) {
+			// Get the Blob
+			ofxCvBlob blob = contourFinder.blobs.at(i);
+			// Prepare the OSC Message
+			ofxOscMessage m;
+			ostringstream rootAddressStringStream;
+			rootAddressStringStream << "/blobTracker/blob/" << i;
+			string rootAddress = rootAddressStringStream.str();
+			// Send the Area
+			m.clear();
+			m.setAddress(rootAddress + "/area");
+			m.addFloatArg(blob.area / (KINECT_DEPTH_HEIGHT * KINECT_DEPTH_WIDTH));
+			oscSender.sendMessage(m, false);
+			// Send the Centroid Position
+			m.clear();
+			m.setAddress(rootAddress + "/centroid/x");
+			m.addFloatArg(blob.centroid.x / KINECT_DEPTH_WIDTH);
+			oscSender.sendMessage(m, false);
+			m.clear();
+			m.setAddress(rootAddress + "/centroid/y");
+			m.addFloatArg(blob.centroid.y / KINECT_DEPTH_HEIGHT);
+			oscSender.sendMessage(m, false);
+		}
 	}
 }
 
