@@ -78,7 +78,7 @@ class ofApp : public ofBaseApp{
 			int maxNumBlobs = 10;
 			bool bFindHoles = false;
 			bool bLearnBackground = true;
-			bool bBlurPass = true;
+			bool bBlurPass = false;
 			float blurStrength = 1.0;
 		} contourFinderSettings;
 
