@@ -2,6 +2,8 @@
 
 This is blob tracking software for use in the MRDRYRT project.
 
+![Blob Tracker Screen Capture](/Capture.PNG)
+
 ### Tested With
 
 * Windows 10
